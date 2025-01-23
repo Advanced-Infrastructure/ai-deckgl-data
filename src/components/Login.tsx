@@ -47,13 +47,11 @@ function LoginForm() {
 
   const handleForm = async () => {
     const { username, password } = form.getFieldsValue(true);
-    if(username === "test" && password === "test") {
       window.sessionStorage.setItem("currentUser", JSON.stringify({
         username: username,
         password: password,
       }))
       history.push("/map")
-    }
   };
 
   return (
