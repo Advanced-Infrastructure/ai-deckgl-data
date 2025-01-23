@@ -1,0 +1,26 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/fe-config-automation/
+    overwrite: true
+file_exists_behavior: OVERWRITE
+permissions:
+  - object: /home/ubuntu/fe-config-automation/deploy.sh
+    mode: 777
+    owner: root
+    type:
+      - file
+hooks:
+  ApplicationStop:
+    - location: application_stop.sh
+      timeout: 300
+      runas: ubuntu
+  BeforeInstall:
+    - location: before_install.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStart:
+    - location: deploy.sh
+      timeout: 500
+      runas: ubuntu
