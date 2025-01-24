@@ -1,4 +1,4 @@
-import { Spin, Tree, Typography } from "antd";
+import { notification, Spin, Tree, Typography } from "antd";
 import "./components.css";
 import { CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
 import { isEmpty } from "lodash";
@@ -59,7 +59,7 @@ const treeData = [
       },
       {
         id: "1b7c46a",
-        key: "85e16c6e-f628-11ed-86b3-0242ac120002",
+        key: "85e16c6e-f628-11ed-86b3-0242ac12002",
         title: "Local Authority Boundary",
         isLeaf: true,
         children: [],
@@ -142,7 +142,7 @@ const treeData = [
       },
       {
         id: "133d25f",
-        key: "7fde8408-d382-11ef-81d2-0242ac120002",
+        key: "7fde8408-d382-11ef-81d2-0242ac12002",
         title: "Green Belt - Scotland",
         isLeaf: true,
         children: [],
@@ -554,7 +554,6 @@ export default function Control({ dataset, setDataset, layers }: any) {
       loading: false,
     },
   ];
-  console.log(layers);
 
   const handleFinish = async (values: any) => {
     const datasetId = values?.key;
@@ -564,13 +563,20 @@ export default function Control({ dataset, setDataset, layers }: any) {
       [datasetId]: { ...updated_data, loading: true },
     }));
     setTimeout(() => {
-      setDataset({
-        [datasetId]: {
-          id: datasetId,
-          url: updated_data?.tile_url,
-          config: updated_data?.config,
-        },
-      });
+      if(updated_data === undefined) {
+       notification.error({
+        placement: "top",
+        message: "download failed"
+       })
+      } else {
+        setDataset({
+          [datasetId]: {
+            id: datasetId,
+            url: updated_data?.tile_url,
+            config: updated_data?.config,
+          },
+        });
+      }
       setDownloading((prev: any) => ({
         ...prev,
         [datasetId]: { ...updated_data, loading: false },

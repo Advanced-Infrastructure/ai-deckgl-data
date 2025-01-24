@@ -8,7 +8,6 @@ export default function PrivateRoute({
 }: any) {
   const loggedIn = useMemo(() => {
     const userToken = window.sessionStorage.getItem("currentUser");
-    console.log(userToken)
     return userToken;
     //eslint-disable-next-line
   }, [window.sessionStorage.getItem("currentUser")]);
