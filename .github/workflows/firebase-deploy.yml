@@ -26,7 +26,7 @@ jobs:
         run: npm install js-yaml --save-dev --legacy-peer-deps
 
       - name: Install firebase-tools locally
-        run: npm install firebase-tools --save-dev --legacy-peer-deps
+        run: npm install -g firebase-tools --save-dev --legacy-peer-deps
 
       - name: Update Browserslist database
         run: npx update-browserslist-db@latest --force || true
@@ -44,6 +44,9 @@ jobs:
         run: npm run build --legacy-peer-deps
         env:
           CI: true 
+
+      - name: Check Firebase CLI Version
+        run: firebase --version
 
       - name: Deploy to Firebase
         run: firebase deploy --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}
