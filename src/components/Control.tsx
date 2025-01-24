@@ -1,8 +1,9 @@
-import { notification, Spin, Tree, Typography } from "antd";
+import { Button, notification, Spin, Tree, Typography } from "antd";
 import "./components.css";
 import { CaretDownOutlined, DownloadOutlined } from "@ant-design/icons";
 import { isEmpty } from "lodash";
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 const { DirectoryTree } = Tree;
 
@@ -157,6 +158,7 @@ const treeData = [
 
 export default function Control({ dataset, setDataset, layers }: any) {
   const [downloading, setDownloading] = useState<any>({});
+  const history = useHistory();
 
   const data = [
     {
@@ -563,11 +565,11 @@ export default function Control({ dataset, setDataset, layers }: any) {
       [datasetId]: { ...updated_data, loading: true },
     }));
     setTimeout(() => {
-      if(updated_data === undefined) {
-       notification.error({
-        placement: "top",
-        message: "download failed"
-       })
+      if (updated_data === undefined) {
+        notification.error({
+          placement: "top",
+          message: "download failed",
+        });
       } else {
         setDataset({
           [datasetId]: {
@@ -586,7 +588,23 @@ export default function Control({ dataset, setDataset, layers }: any) {
 
   return (
     <div style={{ margin: 20 }}>
-      <Typography.Title level={3}>Categories:</Typography.Title>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography.Title level={3}>Categories:</Typography.Title>
+        <Button
+          type="primary"
+          onClick={() => {
+            window.sessionStorage.removeItem("currentUser")
+            history.push("/")
+          }}
+        >
+          Logout
+        </Button>
+      </div>
       <DirectoryTree
         defaultExpandAll
         treeData={treeData}
@@ -604,26 +622,30 @@ export default function Control({ dataset, setDataset, layers }: any) {
                 justifyContent: "space-between",
               }}
             >
-              <div><span style={{ color: "black", marginLeft: 5 }}>{info.title}</span></div>
               <div>
-              {info.isLeaf &&
-                (downloading[info.key]?.loading ? (
-                  <Spin size="small" />
-                ) : (
-                  <>
-                    {isEmpty(layerExist) ? (
-                      <DownloadOutlined
-                        style={{
-                          fontSize: 13,
-                          color: "var(--default-grey)",
-                          marginTop: 4,
-                          marginRight: 5,
-                        }}
-                        onClick={() => handleFinish(info)}
-                      />
-                    ) : null}
-                  </>
-                ))}
+                <span style={{ color: "black", marginLeft: 5 }}>
+                  {info.title}
+                </span>
+              </div>
+              <div>
+                {info.isLeaf &&
+                  (downloading[info.key]?.loading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <>
+                      {isEmpty(layerExist) ? (
+                        <DownloadOutlined
+                          style={{
+                            fontSize: 13,
+                            color: "var(--default-grey)",
+                            marginTop: 4,
+                            marginRight: 5,
+                          }}
+                          onClick={() => handleFinish(info)}
+                        />
+                      ) : null}
+                    </>
+                  ))}
               </div>
             </div>
           );
@@ -632,4 +654,3 @@ export default function Control({ dataset, setDataset, layers }: any) {
     </div>
   );
 }
-
