@@ -1,0 +1,83 @@
+name: Deploy Firebase
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max_old_space_size=4096
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies with legacy peer deps
+        run: npm install --legacy-peer-deps
+
+      - name: Install js-yaml for Firebase Tools
+        run: npm install js-yaml --save-dev --legacy-peer-deps
+
+      - name: Install firebase-tools locally
+        run: npm install -g firebase-tools --save-dev --legacy-peer-deps
+
+      - name: Update Browserslist database
+        run: npx update-browserslist-db@latest --force || true
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            ./node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies and build project
+        run: npm run build --legacy-peer-deps
+        env:
+          CI: true 
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}"
+          channelId: live
+          projectId: ai-deckgl-data-v0
+        env:
+          FIREBASE_CLI_PREVIEWS: hostingchannels
+
+      - name: Send Discord notification on success or failure
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            STATUS=":white_check_mark: Build succeeded!"
+          else
+            STATUS=":x: Build failed!"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg status "$STATUS" \
+            --arg repository "${{ github.repository }}" \
+            --arg ref_name "${{ github.ref_name }}" \
+            --arg workflow "${{ github.workflow }}" \
+            --arg sha "${{ github.sha }}" \
+            '{
+              content: "\($status)\nRepository: **\($repository)**\nBranch: **\($ref_name)**\nPipeline: **\($workflow)**\nCommit: `\($sha)`"
+            }'
+          )
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               https://discord.com/api/webhooks/1240996154527711312/G0qV8eX4jn7nRoujhbqrx2TrjZJzDWO9pONiymjL2mzVDVeYqXtDRLbSGb-tA_oZ2jcz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
