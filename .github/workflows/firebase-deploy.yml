@@ -49,7 +49,7 @@ jobs:
         run: firebase --version
 
       - name: Deploy to Firebase
-        run: firebase deploy --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}
+        run: firebase deploy --project ai-deckgl-data-v0 --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}
 
       - name: Send Discord notification on success or failure
         if: always()
