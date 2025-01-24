@@ -45,11 +45,15 @@ jobs:
         env:
           CI: true 
 
-      - name: Check Firebase CLI Version
-        run: firebase --version
-
-      - name: Deploy to Firebase
-        run: firebase deploy --project ai-deckgl-data-v0 --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_AITL_MASTER }}"
+          channelId: live
+          projectId: ai-deckgl-data-v0
+        env:
+          FIREBASE_CLI_PREVIEWS: hostingchannels
 
       - name: Send Discord notification on success or failure
         if: always()
