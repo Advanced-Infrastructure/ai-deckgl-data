@@ -78,6 +78,6 @@ jobs:
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "$PAYLOAD" \
-               https://discord.com/api/webhooks/1240996154527711312/G0qV8eX4jn7nRoujhbqrx2TrjZJzDWO9pONiymjL2mzVDVeYqXtDRLbSGb-tA_oZ2jcz
+               "${{ secrets.DISCORD_WEBHOOK }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
