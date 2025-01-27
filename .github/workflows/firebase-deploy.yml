@@ -55,29 +55,29 @@ jobs:
         env:
           FIREBASE_CLI_PREVIEWS: hostingchannels
 
-      # - name: Send Discord notification on success or failure
-      #   if: always()
-      #   run: |
-      #     if [ "${{ job.status }}" == "success" ]; then
-      #       STATUS=":white_check_mark: Build succeeded!"
-      #     else
-      #       STATUS=":x: Build failed!"
-      #     fi
+      - name: Send Discord notification on success or failure
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            STATUS=":white_check_mark: Build succeeded!"
+          else
+            STATUS=":x: Build failed!"
+          fi
 
-      #     PAYLOAD=$(jq -n \
-      #       --arg status "$STATUS" \
-      #       --arg repository "${{ github.repository }}" \
-      #       --arg ref_name "${{ github.ref_name }}" \
-      #       --arg workflow "${{ github.workflow }}" \
-      #       --arg sha "${{ github.sha }}" \
-      #       '{
-      #         content: "\($status)\nRepository: **\($repository)**\nBranch: **\($ref_name)**\nPipeline: **\($workflow)**\nCommit: `\($sha)`"
-      #       }'
-      #     )
+          PAYLOAD=$(jq -n \
+            --arg status "$STATUS" \
+            --arg repository "${{ github.repository }}" \
+            --arg ref_name "${{ github.ref_name }}" \
+            --arg workflow "${{ github.workflow }}" \
+            --arg sha "${{ github.sha }}" \
+            '{
+              content: "\($status)\nRepository: **\($repository)**\nBranch: **\($ref_name)**\nPipeline: **\($workflow)**\nCommit: `\($sha)`"
+            }'
+          )
 
-      #     curl -H "Content-Type: application/json" \
-      #          -X POST \
-      #          -d "$PAYLOAD" \
-      #          "${{ secrets.DISCORD_WEBHOOK }}"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               "${{ secrets.DISCORD_WEBHOOK }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
